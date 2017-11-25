@@ -269,19 +269,19 @@ def PutChar (ch,xPos,yPos,color=fColor):
     for a in range(numRows): #row major
         bitNum = 0
         for b in range(bytesPerRow): #do whole row
-        mask = 0x80 #msb first
-        for c in range(8): #do all bits in this byte
-            if (bitNum<xLen): #still within char width?
-                bit = charData[index] & mask
-                if (bit==0): #check the bit
-                    pixel = bColor #0: background color
-                else:
-                    pixel = color #1: foreground color
-                buf.append(pixel>>8) #add pixel to buffer
-                buf.append(pixel&0xFF)
-                mask >>= 1 #goto next bit in byte
-            bitNum += 1 #goto next bit in row
-        index += 1 #goto next byte of data
+            mask = 0x80 #msb first
+            for c in range(8): #do all bits in this byte
+                if (bitNum<xLen): #still within char width?
+                    bit = charData[index] & mask
+                    if (bit==0): #check the bit
+                        pixel = bColor #0: background color
+                    else:
+                        pixel = color #1: foreground color
+                    buf.append(pixel>>8) #add pixel to buffer
+                    buf.append(pixel&0xFF)
+                    mask >>= 1 #goto next bit in byte
+                bitNum += 1 #goto next bit in row
+            index += 1 #goto next byte of data
     spi.writebytes(buf) #send char data to TFT
 def PutString(xPos,yPos,st,color=fColor):
     "Draws string on display at xPos,yPos."
