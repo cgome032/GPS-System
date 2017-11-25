@@ -69,88 +69,88 @@ def InitIO():
 #
 #
 def PulseClock():
-#pulses the serial clock line HIGH
-SetPin(SCLK,1) #bit clocked on low-high transition
-SetPin(SCLK,0) #no delay since python is slow
+    #pulses the serial clock line HIGH
+    SetPin(SCLK,1) #bit clocked on low-high transition
+    SetPin(SCLK,0) #no delay since python is slow
 def WriteByte(value, data=True):
-"sends byte to display using software SPI"
-mask = 0x80 #start with bit7 (msb)
-SetPin(DC,data) #low = command; high = data
-for b in range(8): #loop for 8 bits, msb to lsb
-SetPin(SDAT,value & mask) #put bit on serial data line
-PulseClock() #clock in the bit
-mask >>= 1 #go to next bit
+    "sends byte to display using software SPI"
+    mask = 0x80 #start with bit7 (msb)
+    SetPin(DC,data) #low = command; high = data
+    for b in range(8): #loop for 8 bits, msb to lsb
+    SetPin(SDAT,value & mask) #put bit on serial data line
+    PulseClock() #clock in the bit
+    mask >>= 1 #go to next bit
 def WriteCmd(value):
-"Send command byte to display"
-WriteByte(value,False) #set D/C line to 0 = command
+    "Send command byte to display"
+    WriteByte(value,False) #set D/C line to 0 = command
 def WriteWord (value):
-"sends a 16-bit word to the display as data"
-WriteByte(value >> 8) #write upper 8 bits
-WriteByte(value & 0xFF) #write lower 8 bits
+    "sends a 16-bit word to the display as data"
+    WriteByte(value >> 8) #write upper 8 bits
+    WriteByte(value & 0xFF) #write lower 8 bits
 def WriteList (byteList):
-"Send list of bytes to display, as data"
-for byte in byteList: #grab each byte in list
-WriteByte(byte) #and send it
+    "Send list of bytes to display, as data"
+    for byte in byteList: #grab each byte in list
+        WriteByte(byte) #and send it
 def Write888(value,reps=1):
-"sends a 24-bit RGB pixel data to display, with optional repeat"
-red = value>>16 #red = upper 8 bits
-green = (value>>8) & 0xFF #green = middle 8 bits
-blue = value & 0xFF #blue = lower 8 bits
-RGB = [red,green,blue] #assemble RGB as 3 byte list
-for a in range(reps): #send RGB x optional repeat
-WriteList(RGB)
+    "sends a 24-bit RGB pixel data to display, with optional repeat"
+    red = value>>16 #red = upper 8 bits
+    green = (value>>8) & 0xFF #green = middle 8 bits
+    blue = value & 0xFF #blue = lower 8 bits
+    RGB = [red,green,blue] #assemble RGB as 3 byte list
+    for a in range(reps): #send RGB x optional repeat
+        WriteList(RGB)
 ########################################################################
 #
 # ST7735 driver routines:
 #
 #
 def InitDisplay():
-"Resets & prepares display for active use."
-WriteCmd (SWRESET) #software reset, puts display into sleep
-time.sleep(0.2) #wait 200mS for controller register init
-WriteCmd (SLPOUT) #sleep out
-time.sleep(0.2) #wait 200mS for TFT driver circuits
-WriteCmd (DISPON) #display on!
+    "Resets & prepares display for active use."
+    WriteCmd (SWRESET) #software reset, puts display into sleep
+    time.sleep(0.2) #wait 200mS for controller register init
+    WriteCmd (SLPOUT) #sleep out
+    time.sleep(0.2) #wait 200mS for TFT driver circuits
+    WriteCmd (DISPON) #display on!
 def SetAddrWindow(x0,y0,x1,y1):
-"sets a rectangular display window into which pixel data is placed"
-WriteCmd(CASET) #set column range (x0,x1)
-WriteWord(x0)
-WriteWord(x1)
-WriteCmd(RASET) #set row range (y0,y1)
-WriteWord(y0)
-WriteWord(y1)
+    "sets a rectangular display window into which pixel data is placed"
+    WriteCmd(CASET) #set column range (x0,x1)
+    WriteWord(x0)
+    WriteWord(x1)
+    WriteCmd(RASET) #set row range (y0,y1)
+    WriteWord(y0)
+    WriteWord(y1)
 def DrawPixel(x,y,color):
-"draws a pixel on the TFT display"
-SetAddrWindow(x,y,x,y)
-WriteCmd(RAMWR)
-Write888(color)
+    "draws a pixel on the TFT display"
+    SetAddrWindow(x,y,x,y)
+    WriteCmd(RAMWR)
+    Write888(color)
 def FillRect(x0,y0,x1,y1,color):
-"fills rectangle with given color"
-width = x1-x0+1
-height = y1-y0+1
-SetAddrWindow(x0,y0,x1,y1)
-WriteCmd(RAMWR)
-Write888(color,width*height)
+    "fills rectangle with given color"
+    width = x1-x0+1
+    height = y1-y0+1
+    SetAddrWindow(x0,y0,x1,y1)
+    WriteCmd(RAMWR)
+    Write888(color,width*height)
 def FillScreen(color):
-"Fills entire screen with given color"
-FillRect(0,0,127,159,color)
+    "Fills entire screen with given color"
+    FillRect(0,0,127,159,color)
 def ClearScreen():
-"Fills entire screen with black"
-FillRect(0,0,127,159,BLACK)
+    "Fills entire screen with black"
+    FillRect(0,0,127,159,BLACK)
 ########################################################################
 #
 # Testing routines:
 #
 #
 def TimeDisplay():
-"Measures time required to fill display twice"
-startTime=time.time()
-print " Now painting screen GREEN"
-FillScreen(GREEN)
-print " Now clearing screen"
-ClearScreen()
-elapsedTime=time.time()-startTime
-print " Elapsed time %0.1f seconds" % (elapsedTime)
+    "Measures time required to fill display twice"
+    startTime=time.time()
+    print " Now painting screen GREEN"
+    FillScreen(GREEN)
+    print " Now clearing screen"
+    ClearScreen()
+    elapsedTime=time.time()-startTime
+    print " Elapsed time %0.1f seconds" % (elapsedTime)
 ########################################################################
 #
 # Main Program
