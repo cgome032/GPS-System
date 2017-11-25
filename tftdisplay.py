@@ -393,9 +393,9 @@ def GetIPAddr():
     "Returns IP address as a string"
     cmd = "ifconfig | awk '/192/ {print $2}'"
     res = Run(cmd).replace('\n','') #remove end of line char
-    return res.replace('addr:','') #remove ‘addr:’ prefix
+    return res.replace('addr:','') #remove 'addr:' prefix
 def InfoTest():
-    "Show IP address, CPU temp, and Time”
+    "Show IP address, CPU temp, and Time"
     title = 'Info'
     startTime = time.time()
     PutString(0,0,'IP addr',WHITE)
