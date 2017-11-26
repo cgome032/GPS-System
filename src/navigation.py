@@ -18,7 +18,8 @@ import Adafruit_GPIO as GPIO
 import Adafruit_GPIO.SPI as SPI
 
 # Library for GPS
-import gpsd
+#import gpsd
+from gps3 import gps3
 
 # Library for time
 import time
@@ -53,7 +54,7 @@ bVal = 0
 while True:
     disp.clear((rVal,gVal,bVal))
     disp.display()
-    time.sleep(1) # Wait time will be taken in seconds
+    time.sleep(.5) # Wait time will be taken in seconds
     rVal += 10
     gVal += 10
     bVal += 10
