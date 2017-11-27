@@ -83,7 +83,7 @@ def speedFunc():
     SpeedText = data_stream.TPV['speed']
     if (SpeedText != "n/a"):
         SpeedText = float(SpeedText) * conversionVal
-        SpeedText = str(SpeedText) + " mph"
+        SpeedText = str(round(SpeedText,2)) + " mph"
     return (SpeedText)
 
 
@@ -138,11 +138,13 @@ def coorDistance(point1, point2):
     # Haversine c
     c = 2 * atan2(sqrt(a),sqrt(1-a))
 
+    # Convert km to Miles
     distance = (earthRadius * c) * 0.62137
 
-    return distance
-    
-
+    if(distance <= 0.01):
+        return 0.00
+    else:
+        return round(distance,3)
 
 
 # Screen output function
