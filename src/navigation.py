@@ -93,7 +93,7 @@ speedY = 20
 
 # Location x and y coordiantes
 locX = 10
-locY = 60
+locY = 20
 
 # Converts from m/s to mph
 conversionVal = 2.24
@@ -112,8 +112,13 @@ def speedFunc():
 
 
 def locationFunc():
-    latLoc = latFunc()
-    lonLoc = lonFunc()
+    latLoc = str(latFunc())
+    lonLoc = str(lonFunc())
+
+    reverseString = latLoc + ", " + lonLoc
+
+    location = geolocator.reverse(reverseString)
+    return (location.address)
 
 # Latitude update function, returns float value
 def latFunc():
@@ -205,15 +210,15 @@ def dispDistance():
 # Function ti display location on screen, requires internet to work
 
 def dispLocation():
+    draw.text((locX,locY),locationFunc(),font=ImageFont.truetype("Lato-Medium.ttf",10))
 
-    return 0
 
 # Using dictionary to mimic switch statements
 
 dispOptions = {
         0 : dispSpeed,
         1 : dispDistance,
-        3 : dispLocation
+        2 : dispLocation
 }
 
 
@@ -252,7 +257,7 @@ def checkDisplay():
     if(bGPIO.input(displayButton) and not buttonPress):
         displayIndex += 1
         buttonPress = True
-        if(displayIndex == 2):
+        if(displayIndex == 3):
             displayIndex = 0
     elif(bGPIO.input(displayButton) and buttonPress):
         print ("Still pressed")
