@@ -27,6 +27,25 @@ import time
 # Library for finding distance between two points
 from math import sin, cos, sqrt, atan2, radians
 
+# Import Rpi library to use buttons to switch menus and reset
+#
+import RPi.GPIO as bGPIO
+
+# Setup pins for buttons
+
+bGPIO.setmode(bGPIO.BCM)
+bGPIO.setup(18,bGPIO.IN,pull_up_down=bGPIO.PUD_DOWN)
+
+bGPIO.setup(23,bGPIO.IN,pull_up_down=bGPIO.PUD_DOWN)
+
+# import geopy library for Geocoding
+#
+# Internet access is necessary for this to work
+
+from geopy.geocoders import Nominatim
+
+geolocator = Nominatim()
+
 # Constants for system
 #################################
 
@@ -48,19 +67,19 @@ disp = TFT.ST7735(DC, rst=RST,spi=SPI.SpiDev(SPI_PORT,SPI_DEVICE,max_speed_hz=SP
 disp.begin()
 
 # Background will be set to green
-disp.clear((0,255,0))
+#disp.clear((0,255,0))
 
 
 # Clear screen to white and display
-disp.clear((255,255,255))
+#disp.clear((255,255,255))
 draw = disp.draw()
-draw.rectangle((0,10,127,150),outline=(255,0,0),fill=(0,0,255))
-disp.display()
+#draw.rectangle((0,10,127,150),outline=(255,0,0),fill=(0,0,255))
+#disp.display()
 
 # Speed, Latitude, Longitude placement variables
-currentS = "Current Speed: " # Speed string
-totalDis = "Total Distance: " # Distance string
-currentLoc = "Current Location: " # Location string
+#currentS = "Current Speed: " # Speed string
+#totalDis = "Total Distance: " # Distance string
+#currentLoc = "Current Location: " # Location string
 
 # Distance x and y coordinates
 distX = 10
@@ -90,6 +109,11 @@ def speedFunc():
         SpeedVar = round(SpeedText,0)
     # return (SpeedText)
 
+
+
+def locationFunc():
+    latLoc = latFunc()
+    lonLoc = lonFunc()
 
 # Latitude update function, returns float value
 def latFunc():
@@ -217,12 +241,32 @@ def output():
     disp.display()
 
 
+displayButton = 18 # BCM Pin on raspberry pi
+resetButton = 23 # BCM Pin on raspberry pi
+
+buttonPress = False
+
+def checkDisplay():
+    global buttonPress
+    global displayIndex
+    if(bGPIO.input(displayButton) and not buttonPress):
+        displayIndex += 1
+        buttonPress = True
+        if(displayIndex == 2):
+            displayIndex = 0
+    elif(bGPIO.input(displayButton) and buttonPress):
+        print ("Still pressed")
+    else:
+        buttonPress = False
+    
+
 # Setup gps
 gps_socket=gps3.GPSDSocket()
 data_stream=gps3.DataStream()
 gps_socket.connect()
 gps_socket.watch()
 
+timerPeriod = .1
 # Index value for display
 displayIndex = 0
 for new_data in gps_socket:
@@ -233,10 +277,8 @@ for new_data in gps_socket:
         distFunc()
         speedFunc()
         output()
-        #disp.display()
-        time.sleep(1) # Wait time will be taken in seconds
-        if(displayIndex == 0):
-            displayIndex = 1
-        else:
-            displayIndex = 0
+        checkDisplay()
+        if(bGPIO.input(resetButton)):
+            resDistance()
+        time.sleep(timerPeriod) # Wait time will be taken in seconds
 
