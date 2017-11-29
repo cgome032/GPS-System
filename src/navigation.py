@@ -51,7 +51,7 @@ disp.begin()
 disp.clear((0,255,0))
 
 
-# Clear screen to while and display
+# Clear screen to white and display
 disp.clear((255,255,255))
 draw = disp.draw()
 draw.rectangle((0,10,127,150),outline=(255,0,0),fill=(0,0,255))
@@ -76,6 +76,7 @@ speedY = 40
 locX = 10
 locY = 60
 
+# Converts from m/s to mph
 conversionVal = 2.24
 
 # Speed update function, returns string
@@ -87,7 +88,7 @@ def speedFunc():
     return (SpeedText)
 
 
-# Latitude update function, returns string
+# Latitude update function, returns float value
 def latFunc():
     Latitude = data_stream.TPV['lat']
     if(Latitude == "n/a"):
@@ -102,6 +103,8 @@ def lonFunc():
         return 0
     else:
         return float(Longitude)
+
+# Distance function returns TOTAL distance travelled
 
 totalDistance = 0
 def distFunc():
@@ -119,8 +122,19 @@ def distFunc():
             totalDistance += coorDistance(pointsList[last-1],pointsList[last])
             return totalDistance
 
+# Resets total distance 
+
+def resDistance():
+    global totalDistance
+    totalDistance = 0
+
+
+# Function used to find distance between two coordinates
+# uses Haversine's formula to find.
+# Input points are a tuple
+
 def coorDistance(point1, point2):
-    # Aproximate radius of the Earth in kilometers
+    # Approximate radius of the Earth in kilometers
     earthRadius = 6373.0
 
     lat1 = point1[0]
@@ -147,19 +161,52 @@ def coorDistance(point1, point2):
         return round(distance,3)
 
 
+# Function to display speed on screen
+
+def dispSpeed():
+    
+    # Place distance on variable on screen
+    draw.text((speedX,speedY),speedFunc(),font=ImageFont.load_default())
+
+# Function to display distance on screen
+
+def dispDistance():
+    draw.text((distX,distY),str(distFunc()),font=ImageFont.load_default())
+
+# Function ti display location on screen, requires internet to work
+
+def dispLocation():
+
+    return 0
+
+# Using dictionary to mimic switch statements
+
+dispOptions = {
+        0 : dispSpeed,
+        1 : dispDistance,
+        3 : dispLocation
+}
+
+
 # Screen output function
+
 def output():
+    # Using global variable for displayIndex
+    global displayIndex
     # Clearing screen and applying background
     disp.clear((255,255,255))
     draw.rectangle((0,10,127,150),outline=(255,0,0),fill=(255,0,0))
+
+    # Calls function depending on displayIndex value
+    dispOptions[displayIndex]()
+
     
+    # Will erase if other method works
 
     # place distance variable on screen
-    draw.text((distX,distY),str(distFunc()),font=ImageFont.load_default())
-
-
+    #draw.text((distX,distY),str(distFunc()),font=ImageFont.load_default())
     # place speed variable on screen
-    draw.text((speedX,speedY),speedFunc(),font=ImageFont.load_default())
+    #draw.text((speedX,speedY),speedFunc(),font=ImageFont.load_default())
     
     # Display updates to screen
     disp.display()
@@ -170,6 +217,9 @@ gps_socket=gps3.GPSDSocket()
 data_stream=gps3.DataStream()
 gps_socket.connect()
 gps_socket.watch()
+
+# Index value for display
+displayIndex = 0
 for new_data in gps_socket:
     if new_data:
         data_stream.unpack(new_data)
