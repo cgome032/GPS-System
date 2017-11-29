@@ -70,7 +70,7 @@ pointsList = []
 
 # Speed x and y coordinates
 speedX = 10
-speedY = 40
+speedY = 20
 
 # Location x and y coordiantes
 locX = 10
@@ -80,12 +80,15 @@ locY = 60
 conversionVal = 2.24
 
 # Speed update function, returns string
+
+speedVar = 0
 def speedFunc():
+    global speedVar
     SpeedText = data_stream.TPV['speed']
     if (SpeedText != "n/a"):
         SpeedText = float(SpeedText) * conversionVal
-        SpeedText = str(round(SpeedText,2)) + " mph"
-    return (SpeedText)
+        SpeedVar = round(SpeedText,0)
+    # return (SpeedText)
 
 
 # Latitude update function, returns float value
@@ -94,7 +97,7 @@ def latFunc():
     if(Latitude == "n/a"):
         return 0
     else:
-        return float(Latitude)
+        return float(round(Latitude,4))
 
 # Longitude update function, returns string 
 def lonFunc():
@@ -102,25 +105,27 @@ def lonFunc():
     if (Longitude == "n/a"):
         return 0
     else:
-        return float(Longitude)
+        return float(round(Longitude,4))
 
 # Distance function returns TOTAL distance travelled
 
 totalDistance = 0
+
 def distFunc():
     global totalDistance
     newLat = latFunc()
     newLon = lonFunc()
     if(newLat == 0 or newLon == 0):
-        return (totalDistance)
+        totalDistance = totalDistance
+        # return (totalDistance)
     else:
         pointsList.append((newLat,newLon))
         last = len(pointsList)-1
         if(last == 0):
-            return 0
+            return 
         else:
             totalDistance += coorDistance(pointsList[last-1],pointsList[last])
-            return totalDistance
+            # return totalDistance
 
 # Resets total distance 
 
@@ -166,12 +171,12 @@ def coorDistance(point1, point2):
 def dispSpeed():
     
     # Place distance on variable on screen
-    draw.text((speedX,speedY),speedFunc(),font=ImageFont.load_default())
+    draw.text((speedX,speedY),str(speedVar),font=ImageFont.truetype("Lato-Medium.ttf",72))
 
 # Function to display distance on screen
 
 def dispDistance():
-    draw.text((distX,distY),str(distFunc()),font=ImageFont.load_default())
+    draw.text((distX,distY),str(totalDistance),font=ImageFont.truetype("Lato-Medium.ttf",60))
 
 # Function ti display location on screen, requires internet to work
 
@@ -223,13 +228,15 @@ displayIndex = 0
 for new_data in gps_socket:
     if new_data:
         data_stream.unpack(new_data)
-        #SpeedText = data_stream.TPV['speed']
-        #Latitude = data_stream.TPV['lat']
-        #Longitude = data_stream.TPV['lon']
-        #draw.text((speedX,speedY),str(SpeedText),font=ImageFont.load_default())
         print('Latitude = ',data_stream.TPV['lat'])
         print('Longitude = ',data_stream.TPV['lon'])
+        distFunc()
+        speedFunc()
         output()
         #disp.display()
         time.sleep(1) # Wait time will be taken in seconds
+        if(displayIndex == 0):
+            displayIndex = 1
+        else:
+            displayIndex = 0
 
