@@ -1,4 +1,4 @@
-# GPS-System
+# GPS System
 
 ## Commands to get gpsd started and pointed to UART
 
