@@ -1,4 +1,4 @@
-# GPS-System
+# Setup on the Raspberry Pi
 
 ## Commands to get gpsd started and pointed to UART
 
@@ -18,3 +18,4 @@ sudo gpsd /dev/ttyS0 -F /var/run/gpsd.sock
 
 ## Citations
 [gpsd code used from MartijnBraam](https://github.com/MartijnBraam/gpsd-py3.git "gpsd repository")
+
