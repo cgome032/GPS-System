@@ -100,13 +100,13 @@ conversionVal = 2.24
 
 # Speed update function, returns string
 
-speedVar = 0
+SpeedVar = 0
 def speedFunc():
-    global speedVar
+    global SpeedVar
     SpeedText = data_stream.TPV['speed']
     if (SpeedText != "n/a"):
         SpeedText = float(SpeedText) * conversionVal
-        SpeedVar = round(SpeedText,0)
+        SpeedVar = round(SpeedText,1)
     # return (SpeedText)
 
 
@@ -198,9 +198,9 @@ def coorDistance(point1, point2):
 # Function to display speed on screen
 
 def dispSpeed():
-    
+    global SpeedVar
     # Place distance on variable on screen
-    draw.text((speedX,speedY),str(speedVar),font=ImageFont.truetype("Lato-Medium.ttf",72))
+    draw.text((speedX,speedY),str(SpeedVar),font=ImageFont.truetype("Lato-Medium.ttf",72))
 
 # Function to display distance on screen
 
@@ -257,7 +257,7 @@ def checkDisplay():
     if(bGPIO.input(displayButton) and not buttonPress):
         displayIndex += 1
         buttonPress = True
-        if(displayIndex == 3):
+        if(displayIndex == 2):
             displayIndex = 0
     elif(bGPIO.input(displayButton) and buttonPress):
         print ("Still pressed")
@@ -271,7 +271,7 @@ data_stream=gps3.DataStream()
 gps_socket.connect()
 gps_socket.watch()
 
-timerPeriod = .1
+timerPeriod = .5
 # Index value for display
 displayIndex = 0
 for new_data in gps_socket:
