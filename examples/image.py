@@ -53,16 +53,13 @@ disp = TFT.ST7735(
 
 # Initialize display.
 disp.begin()
-disp.reset()
 
 # Load an image.
-newData = 0x42
-disp.command(newData)
 print('Loading image...')
 image = Image.open('cat.jpg')
 
 # Resize the image and rotate it so matches the display.
-image = image.rotate(270).resize((WIDTH, HEIGHT))
+image = image.rotate(90).resize((WIDTH, HEIGHT))
 
 # Draw the image on the display hardware.
 print('Drawing image')
