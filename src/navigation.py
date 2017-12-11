@@ -210,7 +210,7 @@ def dispDistance():
 # Function ti display location on screen, requires internet to work
 
 def dispLocation():
-    draw.text((locX,locY),locationFunc(),font=ImageFont.truetype("Lato-Medium.ttf",10))
+    draw.text((locX,locY),locationFunc(),font=ImageFont.truetype("Lato-Medium.ttf",8))
 
 
 # Using dictionary to mimic switch statements
@@ -274,16 +274,27 @@ gps_socket.watch()
 timerPeriod = .5
 # Index value for display
 displayIndex = 0
-for new_data in gps_socket:
-    if new_data:
-        data_stream.unpack(new_data)
-        print('Latitude = ',data_stream.TPV['lat'])
-        print('Longitude = ',data_stream.TPV['lon'])
-        distFunc()
-        speedFunc()
-        output()
-        checkDisplay()
-        if(bGPIO.input(resetButton)):
-            resDistance()
-        time.sleep(timerPeriod) # Wait time will be taken in seconds
-
+try:
+    for new_data in gps_socket:
+        if new_data:
+            data_stream.unpack(new_data)
+        if data_stream.TPV['lat'] != 'n/a':
+            print(data_stream.TPV['speed'], data_stream.TPV['lat'], data_stream.TPV['lon'])
+            distFunc()
+            speedFunc()
+            output()
+            checkDisplay()
+            if(bGPIO.input(resetButton)):
+                resDistance()
+        
+        else:
+            output()
+            checkDisplay()
+            if(bGPIO.input(resetButton)):
+                resDistance()
+            print('GPS not connected yet')
+            time.sleep(.1)
+        time.sleep(.8)
+except KeyboardInterrupt:
+    gps_socket.close()
+    print('\nTerminated by user ctrl+c')

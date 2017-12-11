@@ -16,6 +16,7 @@ try:
             latitude = data_stream.TPV['lat']
             longitude = data_stream.TPV['lon']
             altitude = data_stream.TPV['alt']
+            print(speed, latitude, longitude, altitude)
 
         else:
             print('Nothin in gps')
